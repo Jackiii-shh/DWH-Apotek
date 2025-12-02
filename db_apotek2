@@ -1,0 +1,1227 @@
+USE [master]
+GO
+
+--- Drop Database jika sudah ada, untuk memastikan clean slate (opsional, tapi disarankan jika ingin membuat ulang)
+IF EXISTS (SELECT name FROM sys.databases WHERE name = N'db_apotek')
+BEGIN
+    ALTER DATABASE [db_apotek] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+    DROP DATABASE [db_apotek];
+END
+GO
+/****** Object:  Database [db_apotek]    Script Date: 19/10/2025 13:08:40 ******/
+CREATE DATABASE [db_apotek]
+ CONTAINMENT = NONE
+ ON  PRIMARY 
+( NAME = N'db_apotek', FILENAME = N'D:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\DATA\db_apotek.mdf' , SIZE = 8192KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
+ LOG ON 
+( NAME = N'db_apotek_log', FILENAME = N'D:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\DATA\db_apotek_log.ldf' , SIZE = 8192KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
+ WITH CATALOG_COLLATION = DATABASE_DEFAULT, LEDGER = OFF
+GO
+ALTER DATABASE [db_apotek] SET COMPATIBILITY_LEVEL = 160
+GO
+IF (1 = FULLTEXTSERVICEPROPERTY('IsFullTextInstalled'))
+begin
+EXEC [db_apotek].[dbo].[sp_fulltext_database] @action = 'enable'
+end
+GO
+ALTER DATABASE [db_apotek] SET ANSI_NULL_DEFAULT OFF 
+GO
+ALTER DATABASE [db_apotek] SET ANSI_NULLS OFF 
+GO
+ALTER DATABASE [db_apotek] SET ANSI_PADDING OFF 
+GO
+ALTER DATABASE [db_apotek] SET ANSI_WARNINGS OFF 
+GO
+ALTER DATABASE [db_apotek] SET ARITHABORT OFF 
+GO
+ALTER DATABASE [db_apotek] SET AUTO_CLOSE OFF 
+GO
+ALTER DATABASE [db_apotek] SET AUTO_SHRINK OFF 
+GO
+ALTER DATABASE [db_apotek] SET AUTO_UPDATE_STATISTICS ON 
+GO
+ALTER DATABASE [db_apotek] SET CURSOR_CLOSE_ON_COMMIT OFF 
+GO
+ALTER DATABASE [db_apotek] SET CURSOR_DEFAULT  GLOBAL 
+GO
+ALTER DATABASE [db_apotek] SET CONCAT_NULL_YIELDS_NULL OFF 
+GO
+ALTER DATABASE [db_apotek] SET NUMERIC_ROUNDABORT OFF 
+GO
+ALTER DATABASE [db_apotek] SET QUOTED_IDENTIFIER OFF 
+GO
+ALTER DATABASE [db_apotek] SET RECURSIVE_TRIGGERS OFF 
+GO
+ALTER DATABASE [db_apotek] SET  DISABLE_BROKER 
+GO
+ALTER DATABASE [db_apotek] SET AUTO_UPDATE_STATISTICS_ASYNC OFF 
+GO
+ALTER DATABASE [db_apotek] SET DATE_CORRELATION_OPTIMIZATION OFF 
+GO
+ALTER DATABASE [db_apotek] SET TRUSTWORTHY OFF 
+GO
+ALTER DATABASE [db_apotek] SET ALLOW_SNAPSHOT_ISOLATION OFF 
+GO
+ALTER DATABASE [db_apotek] SET PARAMETERIZATION SIMPLE 
+GO
+ALTER DATABASE [db_apotek] SET READ_COMMITTED_SNAPSHOT OFF 
+GO
+ALTER DATABASE [db_apotek] SET HONOR_BROKER_PRIORITY OFF 
+GO
+ALTER DATABASE [db_apotek] SET RECOVERY FULL 
+GO
+ALTER DATABASE [db_apotek] SET  MULTI_USER 
+GO
+ALTER DATABASE [db_apotek] SET PAGE_VERIFY CHECKSUM  
+GO
+ALTER DATABASE [db_apotek] SET DB_CHAINING OFF 
+GO
+ALTER DATABASE [db_apotek] SET FILESTREAM( NON_TRANSACTED_ACCESS = OFF ) 
+GO
+ALTER DATABASE [db_apotek] SET TARGET_RECOVERY_TIME = 60 SECONDS 
+GO
+ALTER DATABASE [db_apotek] SET DELAYED_DURABILITY = DISABLED 
+GO
+ALTER DATABASE [db_apotek] SET ACCELERATED_DATABASE_RECOVERY = OFF  
+GO
+EXEC sys.sp_db_vardecimal_storage_format N'db_apotek', N'ON'
+GO
+ALTER DATABASE [db_apotek] SET QUERY_STORE = ON
+GO
+ALTER DATABASE [db_apotek] SET QUERY_STORE (OPERATION_MODE = READ_WRITE, CLEANUP_POLICY = (STALE_QUERY_THRESHOLD_DAYS = 30), DATA_FLUSH_INTERVAL_SECONDS = 900, INTERVAL_LENGTH_MINUTES = 60, MAX_STORAGE_SIZE_MB = 1000, QUERY_CAPTURE_MODE = AUTO, SIZE_BASED_CLEANUP_MODE = AUTO, MAX_PLANS_PER_QUERY = 200, WAIT_STATS_CAPTURE_MODE = ON)
+GO
+USE [db_apotek]
+GO
+/****** Object:  Schema [db_apotek]    Script Date: 19/10/2025 13:08:40 ******/
+CREATE SCHEMA [db_apotek]
+GO
+--- PEMBUATAN FUNGSI (ENUM TO STRING AND VICE VERSA) (Tetap sama)
+/****** Object:  UserDefinedFunction [db_apotek].[enum2str$tb_admin$Jenis_Kelamin]    Script Date: 19/10/2025 13:08:40 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE FUNCTION [db_apotek].[enum2str$tb_admin$Jenis_Kelamin] 
+( 
+   @setval tinyint
+)
+RETURNS nvarchar(max)
+AS 
+   BEGIN
+      RETURN 
+         CASE @setval
+            WHEN 1 THEN 'L'
+            WHEN 2 THEN 'P'
+            ELSE ''
+         END
+   END
+GO
+/****** Object:  UserDefinedFunction [db_apotek].[enum2str$tb_dokter$Jenis_Kelamin]    Script Date: 19/10/2025 13:08:40 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE FUNCTION [db_apotek].[enum2str$tb_dokter$Jenis_Kelamin] 
+( 
+   @setval tinyint
+)
+RETURNS nvarchar(max)
+AS 
+   BEGIN
+      RETURN 
+         CASE @setval
+            WHEN 1 THEN 'L'
+            WHEN 2 THEN 'P'
+            ELSE ''
+         END
+   END
+GO
+/****** Object:  UserDefinedFunction [db_apotek].[enum2str$tb_obat$Bisa_Diproduksi]    Script Date: 19/10/2025 13:08:40 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE FUNCTION [db_apotek].[enum2str$tb_obat$Bisa_Diproduksi] 
+( 
+   @setval tinyint
+)
+RETURNS nvarchar(max)
+AS 
+   BEGIN
+      RETURN 
+         CASE @setval
+            WHEN 1 THEN 'Ya'
+            WHEN 2 THEN 'Tidak'
+            ELSE ''
+         END
+   END
+GO
+/****** Object:  UserDefinedFunction [db_apotek].[enum2str$tb_pelanggan$Jenis_Kelamin]    Script Date: 19/10/2025 13:08:40 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE FUNCTION [db_apotek].[enum2str$tb_pelanggan$Jenis_Kelamin] 
+( 
+   @setval tinyint
+)
+RETURNS nvarchar(max)
+AS 
+   BEGIN
+      RETURN 
+         CASE @setval
+            WHEN 1 THEN 'L'
+            WHEN 2 THEN 'P'
+            ELSE ''
+         END
+   END
+GO
+/****** Object:  UserDefinedFunction [db_apotek].[enum2str$tb_transaksi$Jenis_Pembayaran]    Script Date: 19/10/2025 13:08:40 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE FUNCTION [db_apotek].[enum2str$tb_transaksi$Jenis_Pembayaran] 
+( 
+   @setval tinyint
+)
+RETURNS nvarchar(max)
+AS 
+   BEGIN
+      RETURN 
+         CASE @setval
+            WHEN 1 THEN 'Online'
+            WHEN 2 THEN 'Offline'
+            ELSE ''
+         END
+   END
+GO
+/****** Object:  UserDefinedFunction [db_apotek].[norm_enum$tb_admin$Jenis_Kelamin]    Script Date: 19/10/2025 13:08:40 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE FUNCTION [db_apotek].[norm_enum$tb_admin$Jenis_Kelamin] 
+( 
+   @setval nvarchar(max)
+)
+RETURNS nvarchar(max)
+AS 
+   BEGIN
+      RETURN db_apotek.enum2str$tb_admin$Jenis_Kelamin(db_apotek.str2enum$tb_admin$Jenis_Kelamin(@setval))
+   END
+GO
+/****** Object:  UserDefinedFunction [db_apotek].[norm_enum$tb_dokter$Jenis_Kelamin]    Script Date: 19/10/2025 13:08:40 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE FUNCTION [db_apotek].[norm_enum$tb_dokter$Jenis_Kelamin] 
+( 
+   @setval nvarchar(max)
+)
+RETURNS nvarchar(max)
+AS 
+   BEGIN
+      RETURN db_apotek.enum2str$tb_dokter$Jenis_Kelamin(db_apotek.str2enum$tb_dokter$Jenis_Kelamin(@setval))
+   END
+GO
+/****** Object:  UserDefinedFunction [db_apotek].[norm_enum$tb_obat$Bisa_Diproduksi]    Script Date: 19/10/2025 13:08:40 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE FUNCTION [db_apotek].[norm_enum$tb_obat$Bisa_Diproduksi] 
+( 
+   @setval nvarchar(max)
+)
+RETURNS nvarchar(max)
+AS 
+   BEGIN
+      RETURN db_apotek.enum2str$tb_obat$Bisa_Diproduksi(db_apotek.str2enum$tb_obat$Bisa_Diproduksi(@setval))
+   END
+GO
+/****** Object:  UserDefinedFunction [db_apotek].[norm_enum$tb_pelanggan$Jenis_Kelamin]    Script Date: 19/10/2025 13:08:40 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE FUNCTION [db_apotek].[norm_enum$tb_pelanggan$Jenis_Kelamin] 
+( 
+   @setval nvarchar(max)
+)
+RETURNS nvarchar(max)
+AS 
+   BEGIN
+      RETURN db_apotek.enum2str$tb_pelanggan$Jenis_Kelamin(db_apotek.str2enum$tb_pelanggan$Jenis_Kelamin(@setval))
+   END
+GO
+/****** Object:  UserDefinedFunction [db_apotek].[norm_enum$tb_transaksi$Jenis_Pembayaran]    Script Date: 19/10/2025 13:08:40 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE FUNCTION [db_apotek].[norm_enum$tb_transaksi$Jenis_Pembayaran] 
+( 
+   @setval nvarchar(max)
+)
+RETURNS nvarchar(max)
+AS 
+   BEGIN
+      RETURN db_apotek.enum2str$tb_transaksi$Jenis_Pembayaran(db_apotek.str2enum$tb_transaksi$Jenis_Pembayaran(@setval))
+   END
+GO
+/****** Object:  UserDefinedFunction [db_apotek].[str2enum$tb_admin$Jenis_Kelamin]    Script Date: 19/10/2025 13:08:40 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE FUNCTION [db_apotek].[str2enum$tb_admin$Jenis_Kelamin] 
+( 
+   @setval nvarchar(max)
+)
+RETURNS tinyint
+AS 
+   BEGIN
+      RETURN 
+         CASE @setval
+            WHEN 'L' THEN 1
+            WHEN 'P' THEN 2
+            ELSE 0
+         END
+   END
+GO
+/****** Object:  UserDefinedFunction [db_apotek].[str2enum$tb_dokter$Jenis_Kelamin]    Script Date: 19/10/2025 13:08:40 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE FUNCTION [db_apotek].[str2enum$tb_dokter$Jenis_Kelamin] 
+( 
+   @setval nvarchar(max)
+)
+RETURNS tinyint
+AS 
+   BEGIN
+      RETURN 
+         CASE @setval
+            WHEN 'L' THEN 1
+            WHEN 'P' THEN 2
+            ELSE 0
+         END
+   END
+GO
+/****** Object:  UserDefinedFunction [db_apotek].[str2enum$tb_obat$Bisa_Diproduksi]    Script Date: 19/10/2025 13:08:40 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE FUNCTION [db_apotek].[str2enum$tb_obat$Bisa_Diproduksi] 
+( 
+   @setval nvarchar(max)
+)
+RETURNS tinyint
+AS 
+   BEGIN
+      RETURN 
+         CASE @setval
+            WHEN 'Ya' THEN 1
+            WHEN 'Tidak' THEN 2
+            ELSE 0
+         END
+   END
+GO
+/****** Object:  UserDefinedFunction [db_apotek].[str2enum$tb_pelanggan$Jenis_Kelamin]    Script Date: 19/10/2025 13:08:40 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE FUNCTION [db_apotek].[str2enum$tb_pelanggan$Jenis_Kelamin] 
+( 
+   @setval nvarchar(max)
+)
+RETURNS tinyint
+AS 
+   BEGIN
+      RETURN 
+         CASE @setval
+            WHEN 'L' THEN 1
+            WHEN 'P' THEN 2
+            ELSE 0
+         END
+   END
+GO
+/****** Object:  UserDefinedFunction [db_apotek].[str2enum$tb_transaksi$Jenis_Pembayaran]    Script Date: 19/10/2025 13:08:40 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE FUNCTION [db_apotek].[str2enum$tb_transaksi$Jenis_Pembayaran] 
+( 
+   @setval nvarchar(max)
+)
+RETURNS tinyint
+AS 
+   BEGIN
+      RETURN 
+         CASE @setval
+            WHEN 'Online' THEN 1
+            WHEN 'Offline' THEN 2
+            ELSE 0
+         END
+   END
+GO
+
+--- PEMBUATAN TABEL
+
+/****** Object:  Table [db_apotek].[tb_admin] ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [db_apotek].[tb_admin](
+	[ID_Admin] [int] IDENTITY(4,1) NOT NULL,
+	[Nama_Admin] [nvarchar](50) NULL,
+	[No_Telp] [nvarchar](15) NULL,
+	[Alamat_Admin] [nvarchar](max) NULL,
+	[Registrasi] [date] NULL,
+	[Jenis_Kelamin] [nvarchar](1) NULL,
+	[Email_Admin] [nvarchar](100) NULL,
+ CONSTRAINT [PK_tb_admin_ID_Admin] PRIMARY KEY CLUSTERED 
+(
+	[ID_Admin] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [db_apotek].[tb_detail_obat] ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [db_apotek].[tb_detail_obat](
+	[ID_Detail_Obat] [int] IDENTITY(11,1) NOT NULL,
+	[Komposisi_Obat] [nvarchar](max) NULL,
+	[Dosis] [nvarchar](50) NULL,
+	[Tanggal] [date] NULL,
+ CONSTRAINT [PK_tb_detail_obat_ID_Detail_Obat] PRIMARY KEY CLUSTERED 
+(
+	[ID_Detail_Obat] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [db_apotek].[tb_dokter] ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [db_apotek].[tb_dokter](
+	[ID_Dokter] [int] IDENTITY(11,1) NOT NULL,
+	[Nama_Dokter] [nvarchar](50) NULL,
+	[Jabatan] [nvarchar](30) NULL,
+	[Jenis_Kelamin] [nvarchar](1) NULL,
+	[No_Telp] [nvarchar](15) NULL,
+	[Alamat] [nvarchar](max) NULL,
+ CONSTRAINT [PK_tb_dokter_ID_Dokter] PRIMARY KEY CLUSTERED 
+(
+	[ID_Dokter] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [db_apotek].[tb_kategori_obat] ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [db_apotek].[tb_kategori_obat](
+	[ID_Kategori_Obat] [int] IDENTITY(6,1) NOT NULL,
+	[Nama_Kategori] [nvarchar](50) NULL,
+	[Deskripsi_Kategori] [nvarchar](max) NULL,
+ CONSTRAINT [PK_tb_kategori_obat_ID_Kategori_Obat] PRIMARY KEY CLUSTERED 
+(
+	[ID_Kategori_Obat] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [db_apotek].[tb_pelanggan] ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [db_apotek].[tb_pelanggan](
+	[ID_Pelanggan] [int] IDENTITY(6,1) NOT NULL,
+	[Nama] [nvarchar](50) NULL,
+	[Jenis_Kelamin] [nvarchar](1) NULL,
+	[No_HP] [nvarchar](15) NULL,
+	[Alamat] [nvarchar](max) NULL,
+ CONSTRAINT [PK_tb_pelanggan_ID_Pelanggan] PRIMARY KEY CLUSTERED 
+(
+	[ID_Pelanggan] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [db_apotek].[tb_resep_obat] ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [db_apotek].[tb_resep_obat](
+	[ID_Resep] [int] IDENTITY(51,1) NOT NULL,
+	[ID_Dokter] [int] NULL,
+	[ID_Detail_Transaksi] [int] NULL,
+	[Tgl_Pembuatan] [date] NULL,
+	[Deskripsi_Resep] [nvarchar](max) NULL,
+ CONSTRAINT [PK_tb_resep_obat_ID_Resep] PRIMARY KEY CLUSTERED 
+(
+	[ID_Resep] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [db_apotek].[tb_transaksi] ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [db_apotek].[tb_transaksi](
+	[ID_Transaksi] [int] IDENTITY(51,1) NOT NULL,
+	[ID_Admin] [int] NULL,
+	[ID_Pelanggan] [int] NULL,
+	[No_Registrasi] [nvarchar](20) NULL,
+	[Tanggal] [date] NULL,
+	[Total_Harga] [decimal](12, 2) NULL,
+	[Jenis_Pembayaran] [nvarchar](7) NULL,
+ CONSTRAINT [PK_tb_transaksi_ID_Transaksi] PRIMARY KEY CLUSTERED 
+(
+	[ID_Transaksi] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+--- PERUBAHAN NAMA: tb_Produsen menjadi tb_Supplier
+/****** Object:  Table [db_apotek].[tb_supplier] ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [db_apotek].[tb_supplier](
+	[ID_Supplier] [int] IDENTITY(4,1) NOT NULL,
+	[Nama_Supplier] [nvarchar](50) NULL,
+	[Alamat] [nvarchar](max) NULL,
+	[No_Telp] [nvarchar](15) NULL,
+ CONSTRAINT [PK_tb_supplier_ID_Supplier] PRIMARY KEY CLUSTERED 
+(
+	[ID_Supplier] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+
+--- PERUBAHAN NAMA: tb_pemesanan_produsen menjadi tb_pemesanan_supplier
+/****** Object:  Table [db_apotek].[tb_pemesanan_supplier] ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [db_apotek].[tb_pemesanan_supplier](
+	[ID_Pemesanan] [int] IDENTITY(8,1) NOT NULL,
+	[ID_Supplier] [int] NULL, -- Kolom diubah namanya
+	[Total_Harga] [decimal](12, 2) NULL,
+	[Tanggal_Pemesanan] [date] NULL,
+ CONSTRAINT [PK_tb_pemesanan_supplier_ID_Pemesanan] PRIMARY KEY CLUSTERED 
+(
+	[ID_Pemesanan] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+--- PERUBAHAN NAMA: Kolom ID_Produsen di tb_obat menjadi ID_Supplier
+/****** Object:  Table [db_apotek].[tb_obat] ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [db_apotek].[tb_obat](
+	[ID_Obat] [int] IDENTITY(11,1) NOT NULL,
+	[ID_Kategori_Obat] [int] NULL,
+	[Nama_Obat] [nvarchar](10) NULL,
+	[Stok_Obat] [int] NULL,
+	[Harga_Jual] [decimal](12, 2) NULL,
+	[Harga_Beli] [decimal](12, 2) NULL,
+	[Bisa_Diproduksi] [nvarchar](5) NULL,
+	[ID_Supplier] [int] NULL, -- Kolom diubah namanya
+ CONSTRAINT [PK_tb_obat_ID_Obat] PRIMARY KEY CLUSTERED 
+(
+	[ID_Obat] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+--- Tabel Detail Pemesanan
+/****** Object:  Table [db_apotek].[tb_detail_pemesanan] ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [db_apotek].[tb_detail_pemesanan](
+	[ID_Detail_Pemesanan] [int] IDENTITY(16,1) NOT NULL,
+	[ID_Pemesanan] [int] NULL,
+	[ID_Obat] [int] NULL,
+	[Tanggal_Pemesanan] [date] NULL,
+	[Jumlah_Pesanan] [int] NULL,
+ CONSTRAINT [PK_tb_detail_pemesanan_ID_Detail_Pemesanan] PRIMARY KEY CLUSTERED 
+(
+	[ID_Detail_Pemesanan] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+--- Tabel Detail Transaksi
+/****** Object:  Table [db_apotek].[tb_detail_transaksi] ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [db_apotek].[tb_detail_transaksi](
+	[ID_Detail_Transaksi] [int] IDENTITY(96,1) NOT NULL,
+	[ID_Transaksi] [int] NULL,
+	[ID_Obat] [int] NULL,
+	[Jumlah] [int] NULL,
+	[Subtotal_Harga] [decimal](12, 2) NULL,
+ CONSTRAINT [PK_tb_detail_transaksi_ID_Detail_Transaksi] PRIMARY KEY CLUSTERED 
+(
+	[ID_Detail_Transaksi] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [db_apotek].[tb_detail_resep] ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [db_apotek].[tb_detail_resep](
+	[ID_Detail_Resep] [int] IDENTITY(51,1) NOT NULL,
+	[ID_Resep] [int] NULL,
+	[ID_Obat] [int] NULL,
+	[Harga_Satuan] [decimal](12, 2) NULL,
+	[Jumlah] [int] NULL,
+ CONSTRAINT [PK_tb_detail_resep_ID_Detail_Resep] PRIMARY KEY CLUSTERED 
+(
+	[ID_Detail_Resep] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+--- PENYISIPAN DATA
+
+SET IDENTITY_INSERT [db_apotek].[tb_admin] ON 
+INSERT [db_apotek].[tb_admin] ([ID_Admin], [Nama_Admin], [No_Telp], [Alamat_Admin], [Registrasi], [Jenis_Kelamin], [Email_Admin]) VALUES (1, N'Admin1', N'081234560001', N'Alamat Admin 1', CAST(N'2024-01-01' AS Date), N'L', N'admin1@email.com')
+INSERT [db_apotek].[tb_admin] ([ID_Admin], [Nama_Admin], [No_Telp], [Alamat_Admin], [Registrasi], [Jenis_Kelamin], [Email_Admin]) VALUES (2, N'Admin2', N'081234560002', N'Alamat Admin 2', CAST(N'2024-01-01' AS Date), N'P', N'admin2@email.com')
+INSERT [db_apotek].[tb_admin] ([ID_Admin], [Nama_Admin], [No_Telp], [Alamat_Admin], [Registrasi], [Jenis_Kelamin], [Email_Admin]) VALUES (3, N'Admin3', N'081234560003', N'Alamat Admin 3', CAST(N'2024-01-01' AS Date), N'L', N'admin3@email.com')
+SET IDENTITY_INSERT [db_apotek].[tb_admin] OFF
+GO
+SET IDENTITY_INSERT [db_apotek].[tb_detail_obat] ON 
+INSERT [db_apotek].[tb_detail_obat] ([ID_Detail_Obat], [Komposisi_Obat], [Dosis], [Tanggal]) VALUES (1, N'Paracetamol 500mg, Povidone, Magnesium Stearate', N'1 tablet setiap 8 jam', CAST(N'2025-03-01' AS Date))
+INSERT [db_apotek].[tb_detail_obat] ([ID_Detail_Obat], [Komposisi_Obat], [Dosis], [Tanggal]) VALUES (2, N'Amoxicillin 250mg, Sodium Benzoate, Talc', N'2x sehari setelah makan', CAST(N'2025-03-03' AS Date))
+INSERT [db_apotek].[tb_detail_obat] ([ID_Detail_Obat], [Komposisi_Obat], [Dosis], [Tanggal]) VALUES (3, N'Ibuprofen 400mg, Corn Starch, Cellulose', N'3x sehari', CAST(N'2025-03-05' AS Date))
+INSERT [db_apotek].[tb_detail_obat] ([ID_Detail_Obat], [Komposisi_Obat], [Dosis], [Tanggal]) VALUES (4, N'Cetirizine 10mg, Lactose, Silica', N'1 tablet malam hari', CAST(N'2025-03-07' AS Date))
+INSERT [db_apotek].[tb_detail_obat] ([ID_Detail_Obat], [Komposisi_Obat], [Dosis], [Tanggal]) VALUES (5, N'Metformin HCl 500mg, Hypromellose, PEG', N'2 tablet per hari', CAST(N'2025-03-10' AS Date))
+INSERT [db_apotek].[tb_detail_obat] ([ID_Detail_Obat], [Komposisi_Obat], [Dosis], [Tanggal]) VALUES (6, N'Amlodipine Besylate 5mg, Microcrystalline Cellulose', N'1 tablet pagi hari', CAST(N'2025-03-12' AS Date))
+INSERT [db_apotek].[tb_detail_obat] ([ID_Detail_Obat], [Komposisi_Obat], [Dosis], [Tanggal]) VALUES (7, N'Simvastatin 20mg, Butylated Hydroxyanisole', N'1 tablet sebelum tidur', CAST(N'2025-03-15' AS Date))
+INSERT [db_apotek].[tb_detail_obat] ([ID_Detail_Obat], [Komposisi_Obat], [Dosis], [Tanggal]) VALUES (8, N'Omeprazole 20mg, Mannitol, Sodium Lauryl Sulfate', N'1 kapsul per hari', CAST(N'2025-03-18' AS Date))
+INSERT [db_apotek].[tb_detail_obat] ([ID_Detail_Obat], [Komposisi_Obat], [Dosis], [Tanggal]) VALUES (9, N'Salbutamol 2mg, Starch, Aspartame', N'1 tablet setiap 6 jam', CAST(N'2025-03-20' AS Date))
+INSERT [db_apotek].[tb_detail_obat] ([ID_Detail_Obat], [Komposisi_Obat], [Dosis], [Tanggal]) VALUES (10, N'Vitamin C 500mg, Citric Acid, Glucose', N'1 tablet setelah makan', CAST(N'2025-03-22' AS Date))
+SET IDENTITY_INSERT [db_apotek].[tb_detail_obat] OFF
+GO
+SET IDENTITY_INSERT [db_apotek].[tb_dokter] ON 
+INSERT [db_apotek].[tb_dokter] ([ID_Dokter], [Nama_Dokter], [Jabatan], [Jenis_Kelamin], [No_Telp], [Alamat]) VALUES (1, N'dr. Andi Prasetyo', N'Dokter Umum', N'L', N'081234567890', N'Jl. Melati No. 12, Bandung')
+INSERT [db_apotek].[tb_dokter] ([ID_Dokter], [Nama_Dokter], [Jabatan], [Jenis_Kelamin], [No_Telp], [Alamat]) VALUES (2, N'dr. Rina Kartika', N'Dokter Gigi', N'P', N'082198765432', N'Jl. Cempaka No. 8, Jakarta Selatan')
+INSERT [db_apotek].[tb_dokter] ([ID_Dokter], [Nama_Dokter], [Jabatan], [Jenis_Kelamin], [No_Telp], [Alamat]) VALUES (3, N'dr. Budi Santoso', N'Dokter Anak', N'L', N'081398743211', N'Jl. Merpati No. 45, Surabaya')
+INSERT [db_apotek].[tb_dokter] ([ID_Dokter], [Nama_Dokter], [Jabatan], [Jenis_Kelamin], [No_Telp], [Alamat]) VALUES (4, N'dr. Sari Widya', N'Dokter Kandungan', N'P', N'085267894321', N'Jl. Flamboyan No. 22, Yogyakarta')
+INSERT [db_apotek].[tb_dokter] ([ID_Dokter], [Nama_Dokter], [Jabatan], [Jenis_Kelamin], [No_Telp], [Alamat]) VALUES (5, N'dr. Teguh Hidayat', N'Dokter Umum', N'L', N'087812345678', N'Jl. Mawar No. 17, Semarang')
+INSERT [db_apotek].[tb_dokter] ([ID_Dokter], [Nama_Dokter], [Jabatan], [Jenis_Kelamin], [No_Telp], [Alamat]) VALUES (6, N'dr. Nita Rahma', N'Dokter Kulit', N'P', N'089612345987', N'Jl. Kenanga No. 3, Medan')
+INSERT [db_apotek].[tb_dokter] ([ID_Dokter], [Nama_Dokter], [Jabatan], [Jenis_Kelamin], [No_Telp], [Alamat]) VALUES (7, N'dr. Aditya Nugraha', N'Dokter Mata', N'L', N'083812349876', N'Jl. Anggrek No. 9, Bekasi')
+INSERT [db_apotek].[tb_dokter] ([ID_Dokter], [Nama_Dokter], [Jabatan], [Jenis_Kelamin], [No_Telp], [Alamat]) VALUES (8, N'dr. Lestari Ayu', N'Dokter THT', N'P', N'082144556677', N'Jl. Dahlia No. 14, Malang')
+INSERT [db_apotek].[tb_dokter] ([ID_Dokter], [Nama_Dokter], [Jabatan], [Jenis_Kelamin], [No_Telp], [Alamat]) VALUES (9, N'dr. Herman Yusuf', N'Dokter Bedah', N'L', N'081288889999', N'Jl. Teratai No. 29, Bogor')
+INSERT [db_apotek].[tb_dokter] ([ID_Dokter], [Nama_Dokter], [Jabatan], [Jenis_Kelamin], [No_Telp], [Alamat]) VALUES (10, N'dr. Maya Sari', N'Dokter Jiwa', N'P', N'087765432123', N'Jl. Kamboja No. 6, Palembang')
+SET IDENTITY_INSERT [db_apotek].[tb_dokter] OFF
+GO
+SET IDENTITY_INSERT [db_apotek].[tb_kategori_obat] ON 
+INSERT [db_apotek].[tb_kategori_obat] ([ID_Kategori_Obat], [Nama_Kategori], [Deskripsi_Kategori]) VALUES (1, N'Analgesik', NULL)
+INSERT [db_apotek].[tb_kategori_obat] ([ID_Kategori_Obat], [Nama_Kategori], [Deskripsi_Kategori]) VALUES (2, N'Antibiotik', NULL)
+INSERT [db_apotek].[tb_kategori_obat] ([ID_Kategori_Obat], [Nama_Kategori], [Deskripsi_Kategori]) VALUES (3, N'Antipiretik', NULL)
+INSERT [db_apotek].[tb_kategori_obat] ([ID_Kategori_Obat], [Nama_Kategori], [Deskripsi_Kategori]) VALUES (4, N'Antiseptik', NULL)
+INSERT [db_apotek].[tb_kategori_obat] ([ID_Kategori_Obat], [Nama_Kategori], [Deskripsi_Kategori]) VALUES (5, N'Antihistamin', NULL)
+SET IDENTITY_INSERT [db_apotek].[tb_kategori_obat] OFF
+GO
+SET IDENTITY_INSERT [db_apotek].[tb_pelanggan] ON 
+INSERT [db_apotek].[tb_pelanggan] ([ID_Pelanggan], [Nama], [Jenis_Kelamin], [No_HP], [Alamat]) VALUES (1, N'Pelanggan1', N'L', N'081234567891', N'Alamat 1')
+INSERT [db_apotek].[tb_pelanggan] ([ID_Pelanggan], [Nama], [Jenis_Kelamin], [No_HP], [Alamat]) VALUES (2, N'Pelanggan2', N'P', N'081234567892', N'Alamat 2')
+INSERT [db_apotek].[tb_pelanggan] ([ID_Pelanggan], [Nama], [Jenis_Kelamin], [No_HP], [Alamat]) VALUES (3, N'Pelanggan3', N'L', N'081234567893', N'Alamat 3')
+INSERT [db_apotek].[tb_pelanggan] ([ID_Pelanggan], [Nama], [Jenis_Kelamin], [No_HP], [Alamat]) VALUES (4, N'Pelanggan4', N'P', N'081234567894', N'Alamat 4')
+INSERT [db_apotek].[tb_pelanggan] ([ID_Pelanggan], [Nama], [Jenis_Kelamin], [No_HP], [Alamat]) VALUES (5, N'Pelanggan5', N'L', N'081234567895', N'Alamat 5')
+SET IDENTITY_INSERT [db_apotek].[tb_pelanggan] OFF
+GO
+SET IDENTITY_INSERT [db_apotek].[tb_supplier] ON 
+INSERT [db_apotek].[tb_supplier] ([ID_Supplier], [Nama_Supplier], [Alamat], [No_Telp]) VALUES (1, N'Kimia Farma', N'Jakarta', NULL)
+INSERT [db_apotek].[tb_supplier] ([ID_Supplier], [Nama_Supplier], [Alamat], [No_Telp]) VALUES (2, N'Kalbe Farma', N'Surabaya', NULL)
+INSERT [db_apotek].[tb_supplier] ([ID_Supplier], [Nama_Supplier], [Alamat], [No_Telp]) VALUES (3, N'Dexa Medica', N'Bandung', NULL)
+SET IDENTITY_INSERT [db_apotek].[tb_supplier] OFF
+GO
+SET IDENTITY_INSERT [db_apotek].[tb_obat] ON 
+INSERT [db_apotek].[tb_obat] ([ID_Obat], [ID_Kategori_Obat], [Nama_Obat], [Stok_Obat], [Harga_Jual], [Harga_Beli], [Bisa_Diproduksi], [ID_Supplier]) VALUES (1, 1, N'Obat1', 100, CAST(25000.00 AS Decimal(12, 2)), CAST(17500.00 AS Decimal(12, 2)), N'Ya', 3)
+INSERT [db_apotek].[tb_obat] ([ID_Obat], [ID_Kategori_Obat], [Nama_Obat], [Stok_Obat], [Harga_Jual], [Harga_Beli], [Bisa_Diproduksi], [ID_Supplier]) VALUES (2, 1, N'Obat2', 80, CAST(30000.00 AS Decimal(12, 2)), CAST(21000.00 AS Decimal(12, 2)), N'Tidak', 1)
+INSERT [db_apotek].[tb_obat] ([ID_Obat], [ID_Kategori_Obat], [Nama_Obat], [Stok_Obat], [Harga_Jual], [Harga_Beli], [Bisa_Diproduksi], [ID_Supplier]) VALUES (3, 1, N'Obat3', 120, CAST(32200.00 AS Decimal(12, 2)), CAST(22540.00 AS Decimal(12, 2)), N'Ya', 2)
+INSERT [db_apotek].[tb_obat] ([ID_Obat], [ID_Kategori_Obat], [Nama_Obat], [Stok_Obat], [Harga_Jual], [Harga_Beli], [Bisa_Diproduksi], [ID_Supplier]) VALUES (4, 1, N'Obat4', 150, CAST(11523.00 AS Decimal(12, 2)), CAST(8066.00 AS Decimal(12, 2)), N'Ya', 2)
+INSERT [db_apotek].[tb_obat] ([ID_Obat], [ID_Kategori_Obat], [Nama_Obat], [Stok_Obat], [Harga_Jual], [Harga_Beli], [Bisa_Diproduksi], [ID_Supplier]) VALUES (5, 1, N'Obat5', 60, CAST(42125.00 AS Decimal(12, 2)), CAST(29487.00 AS Decimal(12, 2)), N'Tidak', 3)
+INSERT [db_apotek].[tb_obat] ([ID_Obat], [ID_Kategori_Obat], [Nama_Obat], [Stok_Obat], [Harga_Jual], [Harga_Beli], [Bisa_Diproduksi], [ID_Supplier]) VALUES (6, 1, N'Obat6', 200, CAST(38900.00 AS Decimal(12, 2)), CAST(27230.00 AS Decimal(12, 2)), N'Ya', 1)
+INSERT [db_apotek].[tb_obat] ([ID_Obat], [ID_Kategori_Obat], [Nama_Obat], [Stok_Obat], [Harga_Jual], [Harga_Beli], [Bisa_Diproduksi], [ID_Supplier]) VALUES (7, 1, N'Obat7', 90, CAST(28926.00 AS Decimal(12, 2)), CAST(20248.00 AS Decimal(12, 2)), N'Ya', 1)
+INSERT [db_apotek].[tb_obat] ([ID_Obat], [ID_Kategori_Obat], [Nama_Obat], [Stok_Obat], [Harga_Jual], [Harga_Beli], [Bisa_Diproduksi], [ID_Supplier]) VALUES (8, 1, N'Obat8', 110, CAST(48732.00 AS Decimal(12, 2)), CAST(34112.00 AS Decimal(12, 2)), N'Tidak', 2)
+INSERT [db_apotek].[tb_obat] ([ID_Obat], [ID_Kategori_Obat], [Nama_Obat], [Stok_Obat], [Harga_Jual], [Harga_Beli], [Bisa_Diproduksi], [ID_Supplier]) VALUES (9, 1, N'Obat9', 130, CAST(30107.00 AS Decimal(12, 2)), CAST(21075.00 AS Decimal(12, 2)), N'Ya', 1)
+INSERT [db_apotek].[tb_obat] ([ID_Obat], [ID_Kategori_Obat], [Nama_Obat], [Stok_Obat], [Harga_Jual], [Harga_Beli], [Bisa_Diproduksi], [ID_Supplier]) VALUES (10, 1, N'Obat10', 75, CAST(34751.00 AS Decimal(12, 2)), CAST(24325.00 AS Decimal(12, 2)), N'Ya', 3)
+SET IDENTITY_INSERT [db_apotek].[tb_obat] OFF
+GO
+SET IDENTITY_INSERT [db_apotek].[tb_pemesanan_supplier] ON 
+INSERT [db_apotek].[tb_pemesanan_supplier] ([ID_Pemesanan], [ID_Supplier], [Total_Harga], [Tanggal_Pemesanan]) VALUES (1, 1, CAST(1500000.00 AS Decimal(12, 2)), CAST(N'2025-03-05' AS Date))
+INSERT [db_apotek].[tb_pemesanan_supplier] ([ID_Pemesanan], [ID_Supplier], [Total_Harga], [Tanggal_Pemesanan]) VALUES (2, 2, CAST(1000000.00 AS Decimal(12, 2)), CAST(N'2025-03-10' AS Date))
+INSERT [db_apotek].[tb_pemesanan_supplier] ([ID_Pemesanan], [ID_Supplier], [Total_Harga], [Tanggal_Pemesanan]) VALUES (3, 3, CAST(1100000.00 AS Decimal(12, 2)), CAST(N'2025-03-15' AS Date))
+INSERT [db_apotek].[tb_pemesanan_supplier] ([ID_Pemesanan], [ID_Supplier], [Total_Harga], [Tanggal_Pemesanan]) VALUES (4, 1, CAST(1700000.00 AS Decimal(12, 2)), CAST(N'2025-04-01' AS Date))
+INSERT [db_apotek].[tb_pemesanan_supplier] ([ID_Pemesanan], [ID_Supplier], [Total_Harga], [Tanggal_Pemesanan]) VALUES (5, 1, CAST(1800000.00 AS Decimal(12, 2)), CAST(N'2025-05-01' AS Date))
+INSERT [db_apotek].[tb_pemesanan_supplier] ([ID_Pemesanan], [ID_Supplier], [Total_Harga], [Tanggal_Pemesanan]) VALUES (6, 2, CAST(900000.00 AS Decimal(12, 2)), CAST(N'2025-04-20' AS Date))
+INSERT [db_apotek].[tb_pemesanan_supplier] ([ID_Pemesanan], [ID_Supplier], [Total_Harga], [Tanggal_Pemesanan]) VALUES (7, 2, CAST(1200000.00 AS Decimal(12, 2)), CAST(N'2025-05-02' AS Date))
+SET IDENTITY_INSERT [db_apotek].[tb_pemesanan_supplier] OFF
+GO
+SET IDENTITY_INSERT [db_apotek].[tb_detail_pemesanan] ON 
+INSERT [db_apotek].[tb_detail_pemesanan] ([ID_Detail_Pemesanan], [ID_Pemesanan], [ID_Obat], [Tanggal_Pemesanan], [Jumlah_Pesanan]) VALUES (1, 1, 2, CAST(N'2025-03-05' AS Date), 50)
+INSERT [db_apotek].[tb_detail_pemesanan] ([ID_Detail_Pemesanan], [ID_Pemesanan], [ID_Obat], [Tanggal_Pemesanan], [Jumlah_Pesanan]) VALUES (2, 1, 7, CAST(N'2025-03-05' AS Date), 40)
+INSERT [db_apotek].[tb_detail_pemesanan] ([ID_Detail_Pemesanan], [ID_Pemesanan], [ID_Obat], [Tanggal_Pemesanan], [Jumlah_Pesanan]) VALUES (3, 2, 3, CAST(N'2025-03-10' AS Date), 70)
+INSERT [db_apotek].[tb_detail_pemesanan] ([ID_Detail_Pemesanan], [ID_Pemesanan], [ID_Obat], [Tanggal_Pemesanan], [Jumlah_Pesanan]) VALUES (4, 2, 8, CAST(N'2025-03-10' AS Date), 30)
+INSERT [db_apotek].[tb_detail_pemesanan] ([ID_Detail_Pemesanan], [ID_Pemesanan], [ID_Obat], [Tanggal_Pemesanan], [Jumlah_Pesanan]) VALUES (5, 3, 1, CAST(N'2025-03-15' AS Date), 60)
+INSERT [db_apotek].[tb_detail_pemesanan] ([ID_Detail_Pemesanan], [ID_Pemesanan], [ID_Obat], [Tanggal_Pemesanan], [Jumlah_Pesanan]) VALUES (6, 3, 5, CAST(N'2025-03-15' AS Date), 90)
+INSERT [db_apotek].[tb_detail_pemesanan] ([ID_Detail_Pemesanan], [ID_Pemesanan], [ID_Obat], [Tanggal_Pemesanan], [Jumlah_Pesanan]) VALUES (7, 4, 4, CAST(N'2025-04-01' AS Date), 100)
+INSERT [db_apotek].[tb_detail_pemesanan] ([ID_Detail_Pemesanan], [ID_Pemesanan], [ID_Obat], [Tanggal_Pemesanan], [Jumlah_Pesanan]) VALUES (8, 4, 9, CAST(N'2025-04-01' AS Date), 120)
+INSERT [db_apotek].[tb_detail_pemesanan] ([ID_Detail_Pemesanan], [ID_Pemesanan], [ID_Obat], [Tanggal_Pemesanan], [Jumlah_Pesanan]) VALUES (9, 5, 10, CAST(N'2025-05-01' AS Date), 80)
+INSERT [db_apotek].[tb_detail_pemesanan] ([ID_Detail_Pemesanan], [ID_Pemesanan], [ID_Obat], [Tanggal_Pemesanan], [Jumlah_Pesanan]) VALUES (10, 5, 6, CAST(N'2025-05-01' AS Date), 75)
+INSERT [db_apotek].[tb_detail_pemesanan] ([ID_Detail_Pemesanan], [ID_Pemesanan], [ID_Obat], [Tanggal_Pemesanan], [Jumlah_Pesanan]) VALUES (11, 6, 3, CAST(N'2025-04-20' AS Date), 45)
+INSERT [db_apotek].[tb_detail_pemesanan] ([ID_Detail_Pemesanan], [ID_Pemesanan], [ID_Obat], [Tanggal_Pemesanan], [Jumlah_Pesanan]) VALUES (12, 6, 7, CAST(N'2025-04-20' AS Date), 55)
+INSERT [db_apotek].[tb_detail_pemesanan] ([ID_Detail_Pemesanan], [ID_Pemesanan], [ID_Obat], [Tanggal_Pemesanan], [Jumlah_Pesanan]) VALUES (13, 7, 2, CAST(N'2025-05-02' AS Date), 35)
+INSERT [db_apotek].[tb_detail_pemesanan] ([ID_Detail_Pemesanan], [ID_Pemesanan], [ID_Obat], [Tanggal_Pemesanan], [Jumlah_Pesanan]) VALUES (14, 7, 8, CAST(N'2025-05-02' AS Date), 65)
+INSERT [db_apotek].[tb_detail_pemesanan] ([ID_Detail_Pemesanan], [ID_Pemesanan], [ID_Obat], [Tanggal_Pemesanan], [Jumlah_Pesanan]) VALUES (15, 7, 10, CAST(N'2025-05-02' AS Date), 20)
+SET IDENTITY_INSERT [db_apotek].[tb_detail_pemesanan] OFF
+GO
+SET IDENTITY_INSERT [db_apotek].[tb_detail_resep] ON 
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (1, 1, 1, CAST(25000.00 AS Decimal(12, 2)), 2)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (2, 2, 2, CAST(30000.00 AS Decimal(12, 2)), 1)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (3, 3, 3, CAST(32200.00 AS Decimal(12, 2)), 3)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (4, 4, 4, CAST(11523.00 AS Decimal(12, 2)), 1)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (5, 5, 5, CAST(42125.00 AS Decimal(12, 2)), 2)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (6, 6, 6, CAST(38900.00 AS Decimal(12, 2)), 1)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (7, 7, 7, CAST(28926.00 AS Decimal(12, 2)), 3)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (8, 8, 8, CAST(48732.00 AS Decimal(12, 2)), 1)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (9, 9, 9, CAST(30107.00 AS Decimal(12, 2)), 2)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (10, 10, 10, CAST(34751.00 AS Decimal(12, 2)), 1)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (11, 11, 1, CAST(25000.00 AS Decimal(12, 2)), 1)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (12, 12, 3, CAST(32200.00 AS Decimal(12, 2)), 2)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (13, 13, 2, CAST(30000.00 AS Decimal(12, 2)), 3)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (14, 14, 6, CAST(38900.00 AS Decimal(12, 2)), 1)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (15, 15, 4, CAST(11523.00 AS Decimal(12, 2)), 2)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (16, 16, 5, CAST(42125.00 AS Decimal(12, 2)), 2)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (17, 17, 9, CAST(30107.00 AS Decimal(12, 2)), 1)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (18, 18, 7, CAST(28926.00 AS Decimal(12, 2)), 2)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (19, 19, 8, CAST(48732.00 AS Decimal(12, 2)), 1)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (20, 20, 10, CAST(34751.00 AS Decimal(12, 2)), 2)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (21, 21, 2, CAST(30000.00 AS Decimal(12, 2)), 1)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (22, 22, 3, CAST(32200.00 AS Decimal(12, 2)), 2)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (23, 23, 4, CAST(11523.00 AS Decimal(12, 2)), 2)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (24, 24, 5, CAST(42125.00 AS Decimal(12, 2)), 1)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (25, 25, 6, CAST(38900.00 AS Decimal(12, 2)), 3)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (26, 26, 7, CAST(28926.00 AS Decimal(12, 2)), 1)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (27, 27, 8, CAST(48732.00 AS Decimal(12, 2)), 2)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (28, 28, 9, CAST(30107.00 AS Decimal(12, 2)), 1)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (29, 29, 1, CAST(25000.00 AS Decimal(12, 2)), 2)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (30, 30, 2, CAST(30000.00 AS Decimal(12, 2)), 1)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (31, 31, 10, CAST(34751.00 AS Decimal(12, 2)), 1)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (32, 32, 6, CAST(38900.00 AS Decimal(12, 2)), 2)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (33, 33, 3, CAST(32200.00 AS Decimal(12, 2)), 2)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (34, 34, 5, CAST(42125.00 AS Decimal(12, 2)), 1)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (35, 35, 9, CAST(30107.00 AS Decimal(12, 2)), 3)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (36, 36, 7, CAST(28926.00 AS Decimal(12, 2)), 1)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (37, 37, 8, CAST(48732.00 AS Decimal(12, 2)), 2)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (38, 38, 4, CAST(11523.00 AS Decimal(12, 2)), 1)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (39, 39, 2, CAST(30000.00 AS Decimal(12, 2)), 2)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (40, 40, 1, CAST(25000.00 AS Decimal(12, 2)), 1)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (41, 41, 10, CAST(34751.00 AS Decimal(12, 2)), 2)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (42, 42, 9, CAST(30107.00 AS Decimal(12, 2)), 1)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (43, 43, 6, CAST(38900.00 AS Decimal(12, 2)), 2)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (44, 44, 5, CAST(42125.00 AS Decimal(12, 2)), 2)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (45, 45, 4, CAST(11523.00 AS Decimal(12, 2)), 1)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (46, 46, 3, CAST(32200.00 AS Decimal(12, 2)), 3)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (47, 47, 2, CAST(30000.00 AS Decimal(12, 2)), 1)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (48, 48, 1, CAST(25000.00 AS Decimal(12, 2)), 2)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (49, 49, 8, CAST(48732.00 AS Decimal(12, 2)), 1)
+INSERT [db_apotek].[tb_detail_resep] ([ID_Detail_Resep], [ID_Resep], [ID_Obat], [Harga_Satuan], [Jumlah]) VALUES (50, 50, 7, CAST(28926.00 AS Decimal(12, 2)), 2)
+SET IDENTITY_INSERT [db_apotek].[tb_detail_resep] OFF
+GO
+SET IDENTITY_INSERT [db_apotek].[tb_detail_transaksi] ON 
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (1, 1, 4, 3, CAST(34569.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (2, 1, 9, 3, CAST(90321.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (3, 2, 3, 2, CAST(96876.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (4, 3, 4, 3, CAST(34569.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (5, 3, 7, 2, CAST(57852.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (6, 3, 10, 2, CAST(31664.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (7, 4, 10, 3, CAST(47496.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (8, 5, 8, 1, CAST(44293.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (9, 5, 1, 2, CAST(90022.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (10, 5, 4, 1, CAST(11523.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (11, 6, 8, 2, CAST(88586.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (12, 7, 6, 2, CAST(20970.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (13, 8, 1, 3, CAST(135033.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (14, 8, 10, 1, CAST(15832.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (15, 9, 4, 1, CAST(11523.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (16, 9, 5, 2, CAST(22620.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (17, 10, 7, 2, CAST(57852.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (18, 11, 3, 3, CAST(145314.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (19, 12, 3, 1, CAST(48438.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (20, 12, 3, 2, CAST(96876.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (21, 13, 1, 1, CAST(45011.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (22, 13, 3, 2, CAST(96876.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (23, 13, 10, 3, CAST(47496.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (24, 14, 6, 2, CAST(20970.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (25, 14, 5, 3, CAST(33930.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (26, 15, 1, 2, CAST(90022.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (27, 16, 5, 3, CAST(33930.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (28, 16, 10, 3, CAST(47496.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (29, 16, 2, 2, CAST(83218.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (30, 17, 3, 3, CAST(145314.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (31, 17, 6, 1, CAST(10485.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (32, 17, 5, 3, CAST(33930.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (33, 18, 9, 3, CAST(90321.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (34, 18, 9, 1, CAST(30107.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (35, 18, 1, 3, CAST(135033.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (36, 19, 3, 2, CAST(96876.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (37, 19, 2, 3, CAST(124827.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (38, 19, 10, 1, CAST(15832.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (39, 20, 3, 3, CAST(145314.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (40, 21, 7, 2, CAST(57852.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (41, 21, 5, 1, CAST(11310.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (42, 21, 3, 2, CAST(96876.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (43, 22, 4, 2, CAST(23046.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (44, 23, 8, 1, CAST(44293.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (45, 23, 6, 2, CAST(20970.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (46, 24, 3, 3, CAST(145314.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (47, 24, 1, 3, CAST(135033.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (48, 25, 9, 2, CAST(60214.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (49, 25, 8, 3, CAST(132879.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (50, 26, 2, 2, CAST(83218.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (51, 26, 1, 3, CAST(135033.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (52, 27, 9, 1, CAST(30107.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (53, 28, 7, 3, CAST(86778.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (54, 28, 8, 1, CAST(44293.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (55, 28, 4, 2, CAST(23046.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (56, 29, 6, 1, CAST(10485.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (57, 30, 3, 1, CAST(48438.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (58, 31, 10, 3, CAST(47496.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (59, 32, 10, 1, CAST(15832.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (60, 32, 9, 2, CAST(60214.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (61, 33, 1, 3, CAST(135033.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (62, 34, 8, 1, CAST(44293.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (63, 34, 3, 2, CAST(96876.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (64, 35, 1, 3, CAST(135033.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (65, 35, 9, 2, CAST(60214.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (66, 35, 1, 1, CAST(45011.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (67, 36, 5, 3, CAST(33930.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (68, 36, 7, 3, CAST(86778.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (69, 37, 7, 3, CAST(86778.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (70, 38, 10, 1, CAST(15832.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (71, 38, 3, 3, CAST(145314.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (72, 39, 7, 2, CAST(57852.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (73, 39, 2, 3, CAST(124827.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (74, 39, 4, 1, CAST(11523.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (75, 40, 1, 3, CAST(135033.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (76, 41, 3, 3, CAST(145314.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (77, 41, 10, 2, CAST(31664.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (78, 41, 6, 2, CAST(20970.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (79, 42, 3, 1, CAST(48438.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (80, 42, 9, 2, CAST(60214.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (81, 42, 3, 2, CAST(96876.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (82, 43, 4, 1, CAST(11523.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (83, 44, 6, 2, CAST(20970.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (84, 45, 9, 2, CAST(60214.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (85, 46, 1, 2, CAST(90022.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (86, 46, 5, 2, CAST(22620.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (87, 46, 9, 2, CAST(60214.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (88, 47, 3, 3, CAST(145314.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (89, 47, 3, 3, CAST(145314.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (90, 47, 7, 3, CAST(86778.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (91, 48, 9, 3, CAST(90321.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (92, 48, 10, 3, CAST(47496.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (93, 49, 5, 3, CAST(33930.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (94, 49, 5, 3, CAST(33930.00 AS Decimal(12, 2)))
+INSERT [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi], [ID_Transaksi], [ID_Obat], [Jumlah], [Subtotal_Harga]) VALUES (95, 50, 6, 1, CAST(10485.00 AS Decimal(12, 2)))
+SET IDENTITY_INSERT [db_apotek].[tb_detail_transaksi] OFF
+GO
+SET IDENTITY_INSERT [db_apotek].[tb_resep_obat] ON 
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (1, 1, 1, CAST(N'2025-03-08' AS Date), N'Dikonsumsi setelah makan, 3x sehari')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (2, 2, 2, CAST(N'2025-03-27' AS Date), N'Gunakan sebelum tidur malam')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (3, 3, 3, CAST(N'2025-04-29' AS Date), N'Minum dua kali sehari')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (4, 4, 4, CAST(N'2025-03-05' AS Date), N'Oleskan pada area yang sakit')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (5, 5, 5, CAST(N'2025-03-06' AS Date), N'Minum sebelum makan, pagi dan sore')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (6, 6, 6, CAST(N'2025-02-13' AS Date), N'Kocok dahulu sebelum diminum')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (7, 7, 7, CAST(N'2025-02-27' AS Date), N'Dikonsumsi 3x sehari setelah makan')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (8, 8, 8, CAST(N'2025-03-18' AS Date), N'Hanya digunakan saat nyeri')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (9, 9, 9, CAST(N'2025-03-10' AS Date), N'Minum saat perut kosong')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (10, 10, 10, CAST(N'2025-02-19' AS Date), N'Dikonsumsi 1 tablet tiap malam')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (11, 1, 11, CAST(N'2025-04-02' AS Date), N'Untuk 5 hari, jangan lebih')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (12, 2, 12, CAST(N'2025-04-17' AS Date), N'Dikonsumsi sebelum tidur')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (13, 3, 13, CAST(N'2025-03-28' AS Date), N'Hindari makanan berlemak')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (14, 4, 14, CAST(N'2025-03-17' AS Date), N'Gunakan selama 7 hari')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (15, 5, 15, CAST(N'2025-04-15' AS Date), N'Minum dengan air hangat')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (16, 6, 16, CAST(N'2025-04-26' AS Date), N'Disimpan di tempat sejuk')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (17, 7, 17, CAST(N'2025-02-10' AS Date), N'Oleskan dua kali sehari')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (18, 8, 18, CAST(N'2025-02-13' AS Date), N'Tidak untuk ibu hamil')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (19, 9, 19, CAST(N'2025-03-14' AS Date), N'Dikonsumsi sebelum sarapan')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (20, 10, 20, CAST(N'2025-03-30' AS Date), N'Campurkan dengan air putih')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (21, 1, 21, CAST(N'2025-03-20' AS Date), N'Hanya jika diperlukan')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (22, 2, 22, CAST(N'2025-03-13' AS Date), N'Minum setiap pagi')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (23, 3, 23, CAST(N'2025-04-30' AS Date), N'Tidak boleh diminum bersamaan dengan obat lain')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (24, 4, 24, CAST(N'2025-03-15' AS Date), N'Dikonsumsi rutin selama 10 hari')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (25, 5, 25, CAST(N'2025-04-19' AS Date), N'Gunakan sesuai petunjuk dokter')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (26, 6, 26, CAST(N'2025-04-21' AS Date), N'Hanya untuk penggunaan luar')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (27, 7, 27, CAST(N'2025-04-18' AS Date), N'Konsumsi 1 kapsul setiap 8 jam')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (28, 8, 28, CAST(N'2025-02-07' AS Date), N'Tidak dianjurkan untuk anak di bawah 12 tahun')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (29, 9, 29, CAST(N'2025-02-06' AS Date), N'Minum setelah sarapan')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (30, 10, 30, CAST(N'2025-02-27' AS Date), N'Dikocok sebelum diminum, hindari sinar matahari langsung')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (31, 1, 31, CAST(N'2025-04-27' AS Date), N'Habiskan dalam 3 hari')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (32, 2, 32, CAST(N'2025-03-27' AS Date), N'Gunakan bila gejala muncul')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (33, 3, 33, CAST(N'2025-02-12' AS Date), N'Minum 3x sehari')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (34, 4, 34, CAST(N'2025-02-03' AS Date), N'Konsumsi rutin sesuai anjuran dokter')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (35, 5, 35, CAST(N'2025-04-10' AS Date), N'Untuk penggunaan luar saja')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (36, 6, 36, CAST(N'2025-03-14' AS Date), N'Boleh diminum dengan atau tanpa makanan')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (37, 7, 37, CAST(N'2025-03-31' AS Date), N'Gunakan bersamaan dengan antibiotik')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (38, 8, 38, CAST(N'2025-04-15' AS Date), N'Dilarang dikonsumsi dengan alkohol')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (39, 9, 39, CAST(N'2025-04-03' AS Date), N'Minum satu tablet sehari')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (40, 10, 40, CAST(N'2025-03-03' AS Date), N'Simpan di bawah suhu ruangan')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (41, 1, 41, CAST(N'2025-03-29' AS Date), N'Dikonsumsi 2 tablet sekaligus')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (42, 2, 42, CAST(N'2025-04-25' AS Date), N'Minum selama 7 hari tanpa jeda')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (43, 3, 43, CAST(N'2025-03-31' AS Date), N'Bisa dikonsumsi sebelum atau sesudah makan')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (44, 4, 44, CAST(N'2025-02-23' AS Date), N'Gunakan pada pagi dan malam hari')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (45, 5, 45, CAST(N'2025-03-12' AS Date), N'Oleskan tipis-tipis saja')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (46, 6, 46, CAST(N'2025-03-29' AS Date), N'Untuk penggunaan rutin setiap hari')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (47, 7, 47, CAST(N'2025-02-03' AS Date), N'Dilarang dikonsumsi bersama kopi')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (48, 8, 48, CAST(N'2025-03-28' AS Date), N'Satu kapsul setiap malam')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (49, 9, 49, CAST(N'2025-02-22' AS Date), N'Berhenti konsumsi jika muncul efek samping')
+INSERT [db_apotek].[tb_resep_obat] ([ID_Resep], [ID_Dokter], [ID_Detail_Transaksi], [Tgl_Pembuatan], [Deskripsi_Resep]) VALUES (50, 10, 50, CAST(N'2025-03-12' AS Date), N'Dikonsumsi selama gejala berlangsung')
+SET IDENTITY_INSERT [db_apotek].[tb_resep_obat] OFF
+GO
+SET IDENTITY_INSERT [db_apotek].[tb_transaksi] ON 
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (1, 2, 2, N'REG001', CAST(N'2025-03-08' AS Date), CAST(124890.00 AS Decimal(12, 2)), N'Offline')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (2, 3, 3, N'REG002', CAST(N'2025-03-27' AS Date), CAST(96876.00 AS Decimal(12, 2)), N'Offline')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (3, 2, 3, N'REG003', CAST(N'2025-04-29' AS Date), CAST(124085.00 AS Decimal(12, 2)), N'Offline')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (4, 2, 4, N'REG004', CAST(N'2025-03-05' AS Date), CAST(47496.00 AS Decimal(12, 2)), N'Online')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (5, 3, 5, N'REG005', CAST(N'2025-03-06' AS Date), CAST(145838.00 AS Decimal(12, 2)), N'Online')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (6, 1, 3, N'REG006', CAST(N'2025-02-13' AS Date), CAST(88586.00 AS Decimal(12, 2)), N'Offline')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (7, 2, 5, N'REG007', CAST(N'2025-02-27' AS Date), CAST(20970.00 AS Decimal(12, 2)), N'Online')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (8, 2, 1, N'REG008', CAST(N'2025-03-18' AS Date), CAST(150865.00 AS Decimal(12, 2)), N'Online')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (9, 3, 4, N'REG009', CAST(N'2025-03-10' AS Date), CAST(34143.00 AS Decimal(12, 2)), N'Offline')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (10, 1, 5, N'REG010', CAST(N'2025-02-19' AS Date), CAST(57852.00 AS Decimal(12, 2)), N'Offline')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (11, 1, 3, N'REG011', CAST(N'2025-04-02' AS Date), CAST(145314.00 AS Decimal(12, 2)), N'Online')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (12, 2, 4, N'REG012', CAST(N'2025-04-17' AS Date), CAST(145314.00 AS Decimal(12, 2)), N'Online')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (13, 1, 5, N'REG013', CAST(N'2025-03-28' AS Date), CAST(189383.00 AS Decimal(12, 2)), N'Offline')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (14, 2, 1, N'REG014', CAST(N'2025-03-17' AS Date), CAST(54900.00 AS Decimal(12, 2)), N'Online')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (15, 2, 4, N'REG015', CAST(N'2025-04-15' AS Date), CAST(90022.00 AS Decimal(12, 2)), N'Online')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (16, 2, 1, N'REG016', CAST(N'2025-04-26' AS Date), CAST(164644.00 AS Decimal(12, 2)), N'Offline')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (17, 3, 4, N'REG017', CAST(N'2025-02-10' AS Date), CAST(189729.00 AS Decimal(12, 2)), N'Offline')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (18, 2, 5, N'REG018', CAST(N'2025-02-13' AS Date), CAST(255461.00 AS Decimal(12, 2)), N'Online')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (19, 3, 5, N'REG019', CAST(N'2025-03-14' AS Date), CAST(237535.00 AS Decimal(12, 2)), N'Offline')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (20, 3, 1, N'REG020', CAST(N'2025-03-30' AS Date), CAST(145314.00 AS Decimal(12, 2)), N'Offline')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (21, 3, 3, N'REG021', CAST(N'2025-03-20' AS Date), CAST(166038.00 AS Decimal(12, 2)), N'Online')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (22, 2, 2, N'REG022', CAST(N'2025-03-13' AS Date), CAST(23046.00 AS Decimal(12, 2)), N'Online')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (23, 3, 2, N'REG023', CAST(N'2025-04-30' AS Date), CAST(65263.00 AS Decimal(12, 2)), N'Offline')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (24, 1, 4, N'REG024', CAST(N'2025-03-15' AS Date), CAST(280347.00 AS Decimal(12, 2)), N'Online')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (25, 1, 4, N'REG025', CAST(N'2025-04-19' AS Date), CAST(193093.00 AS Decimal(12, 2)), N'Offline')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (26, 2, 4, N'REG026', CAST(N'2025-04-21' AS Date), CAST(218251.00 AS Decimal(12, 2)), N'Offline')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (27, 1, 1, N'REG027', CAST(N'2025-04-18' AS Date), CAST(30107.00 AS Decimal(12, 2)), N'Online')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (28, 1, 4, N'REG028', CAST(N'2025-02-07' AS Date), CAST(154117.00 AS Decimal(12, 2)), N'Offline')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (29, 2, 1, N'REG029', CAST(N'2025-02-06' AS Date), CAST(10485.00 AS Decimal(12, 2)), N'Online')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (30, 2, 2, N'REG030', CAST(N'2025-02-27' AS Date), CAST(48438.00 AS Decimal(12, 2)), N'Online')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (31, 2, 5, N'REG031', CAST(N'2025-04-27' AS Date), CAST(47496.00 AS Decimal(12, 2)), N'Offline')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (32, 1, 1, N'REG032', CAST(N'2025-03-27' AS Date), CAST(76046.00 AS Decimal(12, 2)), N'Online')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (33, 3, 4, N'REG033', CAST(N'2025-02-12' AS Date), CAST(135033.00 AS Decimal(12, 2)), N'Online')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (34, 2, 3, N'REG034', CAST(N'2025-02-03' AS Date), CAST(141169.00 AS Decimal(12, 2)), N'Online')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (35, 1, 2, N'REG035', CAST(N'2025-04-10' AS Date), CAST(240258.00 AS Decimal(12, 2)), N'Online')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (36, 2, 4, N'REG036', CAST(N'2025-03-14' AS Date), CAST(120708.00 AS Decimal(12, 2)), N'Offline')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (37, 2, 3, N'REG037', CAST(N'2025-03-31' AS Date), CAST(86778.00 AS Decimal(12, 2)), N'Offline')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (38, 2, 1, N'REG038', CAST(N'2025-04-15' AS Date), CAST(161146.00 AS Decimal(12, 2)), N'Online')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (39, 2, 5, N'REG039', CAST(N'2025-04-03' AS Date), CAST(194202.00 AS Decimal(12, 2)), N'Online')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (40, 3, 5, N'REG040', CAST(N'2025-03-03' AS Date), CAST(135033.00 AS Decimal(12, 2)), N'Online')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (41, 2, 4, N'REG041', CAST(N'2025-03-29' AS Date), CAST(197948.00 AS Decimal(12, 2)), N'Offline')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (42, 3, 4, N'REG042', CAST(N'2025-04-25' AS Date), CAST(205528.00 AS Decimal(12, 2)), N'Offline')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (43, 1, 1, N'REG043', CAST(N'2025-03-31' AS Date), CAST(11523.00 AS Decimal(12, 2)), N'Online')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (44, 3, 5, N'REG044', CAST(N'2025-02-23' AS Date), CAST(20970.00 AS Decimal(12, 2)), N'Offline')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (45, 3, 2, N'REG045', CAST(N'2025-03-12' AS Date), CAST(60214.00 AS Decimal(12, 2)), N'Online')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (46, 2, 4, N'REG046', CAST(N'2025-03-29' AS Date), CAST(172856.00 AS Decimal(12, 2)), N'Online')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (47, 1, 5, N'REG047', CAST(N'2025-02-03' AS Date), CAST(377406.00 AS Decimal(12, 2)), N'Online')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (48, 3, 5, N'REG048', CAST(N'2025-03-28' AS Date), CAST(137817.00 AS Decimal(12, 2)), N'Offline')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (49, 2, 5, N'REG049', CAST(N'2025-02-22' AS Date), CAST(67860.00 AS Decimal(12, 2)), N'Offline')
+INSERT [db_apotek].[tb_transaksi] ([ID_Transaksi], [ID_Admin], [ID_Pelanggan], [No_Registrasi], [Tanggal], [Total_Harga], [Jenis_Pembayaran]) VALUES (50, 3, 3, N'REG050', CAST(N'2025-03-12' AS Date), CAST(10485.00 AS Decimal(12, 2)), N'Offline')
+SET IDENTITY_INSERT [db_apotek].[tb_transaksi] OFF
+GO
+--- PEMBUATAN INDEX (Disesuaikan dengan nama baru)
+/****** Object:  Index [ID_Obat] on tb_detail_pemesanan ******/
+CREATE NONCLUSTERED INDEX [ID_Obat] ON [db_apotek].[tb_detail_pemesanan]
+(
+	[ID_Obat] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+/****** Object:  Index [ID_Pemesanan] on tb_detail_pemesanan ******/
+CREATE NONCLUSTERED INDEX [ID_Pemesanan] ON [db_apotek].[tb_detail_pemesanan]
+(
+	[ID_Pemesanan] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+/****** Object:  Index [ID_Obat] on tb_detail_resep ******/
+CREATE NONCLUSTERED INDEX [ID_Obat] ON [db_apotek].[tb_detail_resep]
+(
+	[ID_Obat] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+/****** Object:  Index [ID_Resep] on tb_detail_resep ******/
+CREATE NONCLUSTERED INDEX [ID_Resep] ON [db_apotek].[tb_detail_resep]
+(
+	[ID_Resep] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+/****** Object:  Index [ID_Obat] on tb_detail_transaksi ******/
+CREATE NONCLUSTERED INDEX [ID_Obat] ON [db_apotek].[tb_detail_transaksi]
+(
+	[ID_Obat] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+/****** Object:  Index [ID_Transaksi] on tb_detail_transaksi ******/
+CREATE NONCLUSTERED INDEX [ID_Transaksi] ON [db_apotek].[tb_detail_transaksi]
+(
+	[ID_Transaksi] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+/****** Object:  Index [ID_Supplier] on tb_obat (Ganti dari fk_obat_produsen) ******/
+CREATE NONCLUSTERED INDEX [ID_Supplier] ON [db_apotek].[tb_obat]
+(
+	[ID_Supplier] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+/****** Object:  Index [ID_Kategori_Obat] on tb_obat ******/
+CREATE NONCLUSTERED INDEX [ID_Kategori_Obat] ON [db_apotek].[tb_obat]
+(
+	[ID_Kategori_Obat] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+/****** Object:  Index [ID_Supplier] on tb_pemesanan_supplier (Ganti dari ID_Produsen) ******/
+CREATE NONCLUSTERED INDEX [ID_Supplier] ON [db_apotek].[tb_pemesanan_supplier]
+(
+	[ID_Supplier] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+/****** Object:  Index [ID_Detail_Transaksi] on tb_resep_obat ******/
+CREATE NONCLUSTERED INDEX [ID_Detail_Transaksi] ON [db_apotek].[tb_resep_obat]
+(
+	[ID_Detail_Transaksi] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+/****** Object:  Index [ID_Dokter] on tb_resep_obat ******/
+CREATE NONCLUSTERED INDEX [ID_Dokter] ON [db_apotek].[tb_resep_obat]
+(
+	[ID_Dokter] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+/****** Object:  Index [ID_Admin] on tb_transaksi ******/
+CREATE NONCLUSTERED INDEX [ID_Admin] ON [db_apotek].[tb_transaksi]
+(
+	[ID_Admin] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+/****** Object:  Index [ID_Pelanggan] on tb_transaksi ******/
+CREATE NONCLUSTERED INDEX [ID_Pelanggan] ON [db_apotek].[tb_transaksi]
+(
+	[ID_Pelanggan] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+
+--- DEFAULT CONSTRAINTS (Disesuaikan dengan nama baru)
+ALTER TABLE [db_apotek].[tb_admin] ADD  DEFAULT (NULL) FOR [Nama_Admin]
+GO
+ALTER TABLE [db_apotek].[tb_admin] ADD  DEFAULT (NULL) FOR [No_Telp]
+GO
+ALTER TABLE [db_apotek].[tb_admin] ADD  DEFAULT (NULL) FOR [Alamat_Admin]
+GO
+ALTER TABLE [db_apotek].[tb_admin] ADD  DEFAULT (NULL) FOR [Registrasi]
+GO
+ALTER TABLE [db_apotek].[tb_admin] ADD  DEFAULT (NULL) FOR [Jenis_Kelamin]
+GO
+ALTER TABLE [db_apotek].[tb_admin] ADD  DEFAULT (NULL) FOR [Email_Admin]
+GO
+ALTER TABLE [db_apotek].[tb_detail_obat] ADD  DEFAULT (NULL) FOR [Komposisi_Obat]
+GO
+ALTER TABLE [db_apotek].[tb_detail_obat] ADD  DEFAULT (NULL) FOR [Dosis]
+GO
+ALTER TABLE [db_apotek].[tb_detail_obat] ADD  DEFAULT (NULL) FOR [Tanggal]
+GO
+ALTER TABLE [db_apotek].[tb_detail_pemesanan] ADD  DEFAULT (NULL) FOR [ID_Pemesanan]
+GO
+ALTER TABLE [db_apotek].[tb_detail_pemesanan] ADD  DEFAULT (NULL) FOR [ID_Obat]
+GO
+ALTER TABLE [db_apotek].[tb_detail_pemesanan] ADD  DEFAULT (NULL) FOR [Tanggal_Pemesanan]
+GO
+ALTER TABLE [db_apotek].[tb_detail_pemesanan] ADD  DEFAULT (NULL) FOR [Jumlah_Pesanan]
+GO
+ALTER TABLE [db_apotek].[tb_detail_resep] ADD  DEFAULT (NULL) FOR [ID_Resep]
+GO
+ALTER TABLE [db_apotek].[tb_detail_resep] ADD  DEFAULT (NULL) FOR [ID_Obat]
+GO
+ALTER TABLE [db_apotek].[tb_detail_resep] ADD  DEFAULT (NULL) FOR [Harga_Satuan]
+GO
+ALTER TABLE [db_apotek].[tb_detail_resep] ADD  DEFAULT (NULL) FOR [Jumlah]
+GO
+ALTER TABLE [db_apotek].[tb_detail_transaksi] ADD  DEFAULT (NULL) FOR [ID_Transaksi]
+GO
+ALTER TABLE [db_apotek].[tb_detail_transaksi] ADD  DEFAULT (NULL) FOR [ID_Obat]
+GO
+ALTER TABLE [db_apotek].[tb_detail_transaksi] ADD  DEFAULT (NULL) FOR [Jumlah]
+GO
+ALTER TABLE [db_apotek].[tb_detail_transaksi] ADD  DEFAULT (NULL) FOR [Subtotal_Harga]
+GO
+ALTER TABLE [db_apotek].[tb_dokter] ADD  DEFAULT (NULL) FOR [Nama_Dokter]
+GO
+ALTER TABLE [db_apotek].[tb_dokter] ADD  DEFAULT (NULL) FOR [Jabatan]
+GO
+ALTER TABLE [db_apotek].[tb_dokter] ADD  DEFAULT (NULL) FOR [Jenis_Kelamin]
+GO
+ALTER TABLE [db_apotek].[tb_dokter] ADD  DEFAULT (NULL) FOR [No_Telp]
+GO
+ALTER TABLE [db_apotek].[tb_dokter] ADD  DEFAULT (NULL) FOR [Alamat]
+GO
+ALTER TABLE [db_apotek].[tb_kategori_obat] ADD  DEFAULT (NULL) FOR [Nama_Kategori]
+GO
+ALTER TABLE [db_apotek].[tb_kategori_obat] ADD  DEFAULT (NULL) FOR [Deskripsi_Kategori]
+GO
+ALTER TABLE [db_apotek].[tb_obat] ADD  DEFAULT (NULL) FOR [ID_Kategori_Obat]
+GO
+ALTER TABLE [db_apotek].[tb_obat] ADD  DEFAULT (NULL) FOR [Nama_Obat]
+GO
+ALTER TABLE [db_apotek].[tb_obat] ADD  DEFAULT (NULL) FOR [Stok_Obat]
+GO
+ALTER TABLE [db_apotek].[tb_obat] ADD  DEFAULT (NULL) FOR [Harga_Jual]
+GO
+ALTER TABLE [db_apotek].[tb_obat] ADD  DEFAULT (NULL) FOR [Harga_Beli]
+GO
+ALTER TABLE [db_apotek].[tb_obat] ADD  DEFAULT (NULL) FOR [Bisa_Diproduksi]
+GO
+ALTER TABLE [db_apotek].[tb_obat] ADD  DEFAULT (NULL) FOR [ID_Supplier]
+GO
+ALTER TABLE [db_apotek].[tb_pelanggan] ADD  DEFAULT (NULL) FOR [Nama]
+GO
+ALTER TABLE [db_apotek].[tb_pelanggan] ADD  DEFAULT (NULL) FOR [Jenis_Kelamin]
+GO
+ALTER TABLE [db_apotek].[tb_pelanggan] ADD  DEFAULT (NULL) FOR [No_HP]
+GO
+ALTER TABLE [db_apotek].[tb_pelanggan] ADD  DEFAULT (NULL) FOR [Alamat]
+GO
+ALTER TABLE [db_apotek].[tb_pemesanan_supplier] ADD  DEFAULT (NULL) FOR [ID_Supplier]
+GO
+ALTER TABLE [db_apotek].[tb_pemesanan_supplier] ADD  DEFAULT (NULL) FOR [Total_Harga]
+GO
+ALTER TABLE [db_apotek].[tb_pemesanan_supplier] ADD  DEFAULT (NULL) FOR [Tanggal_Pemesanan]
+GO
+ALTER TABLE [db_apotek].[tb_supplier] ADD  DEFAULT (NULL) FOR [Nama_Supplier]
+GO
+ALTER TABLE [db_apotek].[tb_supplier] ADD  DEFAULT (NULL) FOR [Alamat]
+GO
+ALTER TABLE [db_apotek].[tb_supplier] ADD  DEFAULT (NULL) FOR [No_Telp]
+GO
+ALTER TABLE [db_apotek].[tb_resep_obat] ADD  DEFAULT (NULL) FOR [ID_Dokter]
+GO
+ALTER TABLE [db_apotek].[tb_resep_obat] ADD  DEFAULT (NULL) FOR [ID_Detail_Transaksi]
+GO
+ALTER TABLE [db_apotek].[tb_resep_obat] ADD  DEFAULT (NULL) FOR [Tgl_Pembuatan]
+GO
+ALTER TABLE [db_apotek].[tb_resep_obat] ADD  DEFAULT (NULL) FOR [Deskripsi_Resep]
+GO
+ALTER TABLE [db_apotek].[tb_transaksi] ADD  DEFAULT (NULL) FOR [ID_Admin]
+GO
+ALTER TABLE [db_apotek].[tb_transaksi] ADD  DEFAULT (NULL) FOR [ID_Pelanggan]
+GO
+ALTER TABLE [db_apotek].[tb_transaksi] ADD  DEFAULT (NULL) FOR [No_Registrasi]
+GO
+ALTER TABLE [db_apotek].[tb_transaksi] ADD  DEFAULT (NULL) FOR [Tanggal]
+GO
+ALTER TABLE [db_apotek].[tb_transaksi] ADD  DEFAULT (NULL) FOR [Total_Harga]
+GO
+ALTER TABLE [db_apotek].[tb_transaksi] ADD  DEFAULT (NULL) FOR [Jenis_Pembayaran]
+GO
+
+--- FOREIGN KEY CONSTRAINTS (Disesuaikan dengan nama baru)
+ALTER TABLE [db_apotek].[tb_detail_pemesanan]  WITH NOCHECK ADD  CONSTRAINT [tb_detail_pemesanan_ibfk_1] FOREIGN KEY([ID_Pemesanan])
+REFERENCES [db_apotek].[tb_pemesanan_supplier] ([ID_Pemesanan])
+GO
+ALTER TABLE [db_apotek].[tb_detail_pemesanan] CHECK CONSTRAINT [tb_detail_pemesanan_ibfk_1]
+GO
+ALTER TABLE [db_apotek].[tb_detail_pemesanan]  WITH NOCHECK ADD  CONSTRAINT [tb_detail_pemesanan_ibfk_2] FOREIGN KEY([ID_Obat])
+REFERENCES [db_apotek].[tb_obat] ([ID_Obat])
+GO
+ALTER TABLE [db_apotek].[tb_detail_pemesanan] CHECK CONSTRAINT [tb_detail_pemesanan_ibfk_2]
+GO
+ALTER TABLE [db_apotek].[tb_detail_resep]  WITH NOCHECK ADD  CONSTRAINT [tb_detail_resep_ibfk_1] FOREIGN KEY([ID_Resep])
+REFERENCES [db_apotek].[tb_resep_obat] ([ID_Resep])
+GO
+ALTER TABLE [db_apotek].[tb_detail_resep] CHECK CONSTRAINT [tb_detail_resep_ibfk_1]
+GO
+ALTER TABLE [db_apotek].[tb_detail_resep]  WITH NOCHECK ADD  CONSTRAINT [tb_detail_resep_ibfk_2] FOREIGN KEY([ID_Obat])
+REFERENCES [db_apotek].[tb_obat] ([ID_Obat])
+GO
+ALTER TABLE [db_apotek].[tb_detail_resep] CHECK CONSTRAINT [tb_detail_resep_ibfk_2]
+GO
+ALTER TABLE [db_apotek].[tb_detail_transaksi]  WITH NOCHECK ADD  CONSTRAINT [tb_detail_transaksi_ibfk_1] FOREIGN KEY([ID_Transaksi])
+REFERENCES [db_apotek].[tb_transaksi] ([ID_Transaksi])
+GO
+ALTER TABLE [db_apotek].[tb_detail_transaksi] CHECK CONSTRAINT [tb_detail_transaksi_ibfk_1]
+GO
+ALTER TABLE [db_apotek].[tb_detail_transaksi]  WITH NOCHECK ADD  CONSTRAINT [tb_detail_transaksi_ibfk_2] FOREIGN KEY([ID_Obat])
+REFERENCES [db_apotek].[tb_obat] ([ID_Obat])
+GO
+ALTER TABLE [db_apotek].[tb_detail_transaksi] CHECK CONSTRAINT [tb_detail_transaksi_ibfk_2]
+GO
+ALTER TABLE [db_apotek].[tb_obat]  WITH NOCHECK ADD  CONSTRAINT [fk_obat_supplier] FOREIGN KEY([ID_Supplier])
+REFERENCES [db_apotek].[tb_supplier] ([ID_Supplier])
+GO
+ALTER TABLE [db_apotek].[tb_obat] CHECK CONSTRAINT [fk_obat_supplier]
+GO
+ALTER TABLE [db_apotek].[tb_obat]  WITH NOCHECK ADD  CONSTRAINT [tb_obat_ibfk_1] FOREIGN KEY([ID_Kategori_Obat])
+REFERENCES [db_apotek].[tb_kategori_obat] ([ID_Kategori_Obat])
+GO
+ALTER TABLE [db_apotek].[tb_obat] CHECK CONSTRAINT [tb_obat_ibfk_1]
+GO
+ALTER TABLE [db_apotek].[tb_pemesanan_supplier]  WITH NOCHECK ADD  CONSTRAINT [tb_pemesanan_supplier_ibfk_1] FOREIGN KEY([ID_Supplier])
+REFERENCES [db_apotek].[tb_supplier] ([ID_Supplier])
+GO
+ALTER TABLE [db_apotek].[tb_pemesanan_supplier] CHECK CONSTRAINT [tb_pemesanan_supplier_ibfk_1]
+GO
+ALTER TABLE [db_apotek].[tb_resep_obat]  WITH NOCHECK ADD  CONSTRAINT [tb_resep_obat_ibfk_1] FOREIGN KEY([ID_Dokter])
+REFERENCES [db_apotek].[tb_dokter] ([ID_Dokter])
+GO
+ALTER TABLE [db_apotek].[tb_resep_obat] CHECK CONSTRAINT [tb_resep_obat_ibfk_1]
+GO
+ALTER TABLE [db_apotek].[tb_resep_obat]  WITH NOCHECK ADD  CONSTRAINT [tb_resep_obat_ibfk_2] FOREIGN KEY([ID_Detail_Transaksi])
+REFERENCES [db_apotek].[tb_detail_transaksi] ([ID_Detail_Transaksi])
+GO
+ALTER TABLE [db_apotek].[tb_resep_obat] CHECK CONSTRAINT [tb_resep_obat_ibfk_2]
+GO
+ALTER TABLE [db_apotek].[tb_transaksi]  WITH NOCHECK ADD  CONSTRAINT [tb_transaksi_ibfk_1] FOREIGN KEY([ID_Admin])
+REFERENCES [db_apotek].[tb_admin] ([ID_Admin])
+GO
+ALTER TABLE [db_apotek].[tb_transaksi] CHECK CONSTRAINT [tb_transaksi_ibfk_1]
+GO
+ALTER TABLE [db_apotek].[tb_transaksi]  WITH NOCHECK ADD  CONSTRAINT [tb_transaksi_ibfk_2] FOREIGN KEY([ID_Pelanggan])
+REFERENCES [db_apotek].[tb_pelanggan] ([ID_Pelanggan])
+GO
+ALTER TABLE [db_apotek].[tb_transaksi] CHECK CONSTRAINT [tb_transaksi_ibfk_2]
+GO
+USE [master]
+GO
+ALTER DATABASE [db_apotek] SET  READ_WRITE 
+GO
